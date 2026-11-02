@@ -14,6 +14,6 @@ LUCI_DEPENDS:=
 PKG_LICENSE:=MIT
 PKG_MAINTAINER:=hakureiyuyuko <hakureiyuyuko@users.noreply.github.com>
 
-include ../../luci.mk
+include $(TOPDIR)/feeds/luci/luci.mk
 
 # call BuildPackage - OpenWrt buildroot signature
