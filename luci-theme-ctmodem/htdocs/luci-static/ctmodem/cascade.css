@@ -7,6 +7,7 @@
 
 /* ---------- 基础 ---------- */
 :root {
+	color-scheme: light dark;
 	--ont-orange: #EF8218;
 	--ont-orange-d: #D9700A;
 	--ont-orange-l: #FFA04A;
@@ -1651,4 +1652,179 @@ body:has(#loginwrap) {
 #maincontent.ont-plain ul.cbi-tabmenu > li.cbi-tab > a {
 	color: #000;
 	font-weight: normal;
+}
+
+/* ---------- 自动深色模式（跟随系统 prefers-color-scheme） ----------
+ * 只覆盖颜色；橙 / 蓝导航主色不变，按钮略压暗。选择器与上文保持一致以便按顺序覆盖。
+ * --ont-bg* / --ont-input / --ont-btn* 只在本块定义，仅供深色规则使用。
+ */
+@media (prefers-color-scheme: dark) {
+	:root {
+		--ont-grey: #2A2D31;
+		--ont-grey-bar: #2E3236;
+		--ont-grey-field: #272A2E;
+		--ont-border: #4A4E53;
+		--ont-border-l: #383B3F;
+		--ont-text: #D8DADC;
+		--ont-text-2: #A2A6AA;
+		--ont-link: #74AAE6;
+		--ont-link-h: #FF7A5C;
+		--ont-red: #FF6B57;
+		--ont-green: #5DBB7A;
+		--ont-bg: #1E2125;
+		--ont-bg-2: #24272B;
+		--ont-input: #17191C;
+		--ont-bg-strip: #26292C;      /* 标签条、进度条槽、禁用控件 */
+		--ont-bg-invalid: #3A2220;
+		--ont-btn-border: #5A5E63;
+		--ont-btn-border-h: #74787D;
+		--ont-btn-bg: linear-gradient(#3A3E43, #2F3337);
+		--ont-btn-bg-h: linear-gradient(#464A4F, #383C41);
+	}
+
+	body, body:has(#loginwrap) { background: #131517; }
+	::selection { background: rgba(239, 130, 24, .4); }
+	a:active, h1, h2, h3, h4, h5, h6 { color: var(--ont-text); }
+	small, .cbi-value-description, .cbi-section-table .tr.cbi-section-table-descr .th,
+	.spinning, .uci-dialog .uci-change-legend, .errorbox code { color: var(--ont-text-2); }
+
+	/* 原厂头图是白底，压暗避免刺眼 */
+	#gwhead { filter: brightness(.82); }
+
+	#gwbody { border-color: var(--ont-border-l); }
+	#gwcopy { background: #25282B; border-top-color: #34373B; color: var(--ont-text-2); }
+
+	/* 白底面板 */
+	#page, #maincontent, .cbi-section-node, .table, .ifacebox, .modal, .cbi-modal,
+	.cbi-filebrowser, ul.ont-tabs > li.active,
+	.cbi-tabmenu > li.cbi-tab > a, .tabs > li.active > a { background-color: var(--ont-bg); }
+	.errorbox, .cbi-section-actions, .cbi-rowstyle-2, .cbi-dynlist > .item,
+	.cbi-tab-descr { background: var(--ont-bg-2); }
+	.cbi-filebrowser { border-color: var(--ont-border); }
+	.modal, .cbi-modal { border-color: var(--ont-border); }
+
+	/* 深色文字 → 浅色 */
+	#leftmenu > li > a,
+	html:not(.ont-plain-page) #maincontent ul.cbi-tabmenu > li > a,
+	.cbi-value-title, .table .th, .ifacebox-head, ul.ont-tabs > li > a,
+	.cbi-tabmenu > li > a, .tabs > li > a,
+	.cbi-tabmenu > li.cbi-tab > a, .tabs > li.active > a { color: var(--ont-text); }
+	.table .tr > .td:first-child:has(+ .td:last-child) { background: var(--ont-grey-field); color: var(--ont-text); }
+	.table .tr:hover { background: #2B2925; }
+
+	/* 标签页 */
+	.cbi-tabmenu, .tabs { background: var(--ont-bg-strip); }
+	.cbi-tabmenu > li.cbi-tab-disabled > a, .tabs > li.disabled > a { color: #5F7584; }
+	ul.ont-tabs > li { background: var(--ont-bg-2); border-color: var(--ont-border); }
+	ul.ont-tabs > li.active > a { color: var(--ont-link-h); }
+
+	/* 输入控件 */
+	input[type="text"], input[type="password"], input[type="search"], input[type="email"],
+	input[type="url"], input[type="number"], input[type="tel"], input[type="file"],
+	textarea, select, .cbi-input-text, .cbi-input-password, .cbi-input-select, .cbi-input-file,
+	.cbi-dropdown, .cbi-dropdown > ul.dropdown > li > input,
+	.cbi-dropdown > ul.dropdown > li > input[type="text"] {
+		color: var(--ont-text);
+		background-color: var(--ont-input);
+		border-color: #565A5F;
+	}
+	.cbi-dropdown:hover { border-color: var(--ont-btn-border-h); }
+	.cbi-dropdown > ul > li[display]:not([display="0"]) { border-left-color: var(--ont-border); }
+	.cbi-dropdown > .open, .cbi-dropdown > .more { color: var(--ont-text-2); }
+	input[disabled], select[disabled], textarea[disabled] { background: var(--ont-bg-strip); color: #7A7E83; }
+	.cbi-input-invalid, input.cbi-input-invalid { background: var(--ont-bg-invalid); }
+
+	/* 下拉列表 */
+	.cbi-dropdown > ul.dropdown,
+	.cbi-dropdown[open] > ul.dropdown,
+	.cbi-dropdown.open > ul.dropdown { background: var(--ont-bg); border-color: var(--ont-btn-border); }
+	.cbi-dropdown[open] > ul.dropdown > li { background: var(--ont-bg); color: var(--ont-text); border-bottom-color: var(--ont-border-l); }
+	.cbi-dropdown[open] > ul.dropdown > li:hover,
+	.cbi-dropdown[open] > ul.dropdown > li.focus { background: #4A3520; color: var(--ont-text); }
+	.cbi-dropdown.btn > .open .dropdown,
+	.cbi-dropdown.cbi-button > .open .dropdown { color: var(--ont-text); }
+
+	/* 普通按钮：去掉浅色底纹图 */
+	button, .btn, .cbi-button, input[type="button"], input[type="submit"], input[type="reset"],
+	.cbi-dropdown.btn, .cbi-dropdown.cbi-button {
+		color: var(--ont-text);
+		background: var(--ont-btn-bg);
+		border-color: var(--ont-btn-border);
+	}
+	button:hover, .btn:hover, .cbi-button:hover,
+	input[type="button"]:hover, input[type="submit"]:hover {
+		background: var(--ont-btn-bg-h);
+		border-color: var(--ont-btn-border-h);
+		color: #FFF;
+	}
+	button:active, .cbi-button:active { background: linear-gradient(#2A2D31, #33373B); }
+	.cbi-button-action, .cbi-button-reload, .cbi-button-link, .btn.secondary {
+		background: linear-gradient(#2F4352, #263846);
+		border-color: #4C6678;
+		color: #CFE0EC;
+	}
+	.cbi-button-action:hover { background: linear-gradient(#36505F, #2C4252); border-color: #5E7A8D; }
+	/* 主按钮 / 危险按钮重新声明，避免被上面的通用按钮规则盖掉 */
+	.btn.primary, .cbi-button-apply, .cbi-button-save, .cbi-button-positive, .btn.important,
+	.cbi-dropdown.btn.cbi-button-apply, .cbi-dropdown.btn.important,
+	.cbi-dropdown.cbi-button.cbi-button-apply {
+		background: linear-gradient(#E8892E, #C96A0C);
+		border-color: #A85A0A;
+		color: #FFF;
+	}
+	.btn.primary:hover, .cbi-button-apply:hover, .cbi-button-save:hover, .cbi-button-positive:hover {
+		background: linear-gradient(#F0963E, #D9700A);
+		color: #FFF;
+	}
+	.cbi-button-negative, .cbi-button-remove, .btn.danger, .btn.error {
+		background: linear-gradient(#D9644C, #B8452F);
+		border-color: #93371F;
+		color: #FFF;
+	}
+	.cbi-button-negative:hover, .cbi-button-remove:hover, .btn.danger:hover {
+		background: linear-gradient(#E2745C, #C6503A);
+		color: #FFF;
+	}
+
+	/* 提示条 / 标签 */
+	.alert-message, .notice, .alert-message.notice, .label.notice { background: #1F2B35; border-color: #3B5366; color: #B9D2E6; }
+	.alert-message.warning, .label.warning, .cbi-tooltip { background: #332C17; border-color: #6E5A22; color: #E8D49A; }
+	.alert-message.error, .label.danger, .label.error { background: var(--ont-bg-invalid); border-color: #7A3A31; color: #F2B0A6; }
+	.alert-message.success, .label.success { background: #1E3022; border-color: #3D6B45; color: #A9DAB3; }
+	.label, .ifacebadge, .zonebadge, .label.info { background: #26323A; border-color: #475A66; color: #C2D3DE; }
+	/* 区域徽标由 LuCI 内联浅色背景，文字保持深色 */
+	.zonebadge[style*="background"] { color: #1B1B1B; }
+
+	/* 进度条 */
+	.progress, .cbi-progressbar { background: var(--ont-bg-strip); border-color: #55595E; }
+	.cbi-progressbar > div > span { color: #FFF; text-shadow: 0 0 2px rgba(0, 0, 0, .9); }
+
+	.spinning::before { border-color: #44505A; border-top-color: var(--ont-orange); }
+
+	/* 登录页 */
+	#loginbox .login-row input { background: var(--ont-input); color: var(--ont-text); border-color: #4C6678; }
+	#loginbox .login-btn { background: var(--ont-btn-bg); color: var(--ont-text); border-color: var(--ont-btn-border); }
+	#loginbox .login-btn:hover { background: var(--ont-btn-bg-h); }
+
+	/* 插件页兜底 */
+	#maincontent.ont-plain button, #maincontent.ont-plain .btn, #maincontent.ont-plain .cbi-button {
+		background: var(--ont-bg-2);
+		border-color: var(--ont-border);
+		color: var(--ont-text);
+	}
+	#maincontent.ont-plain .table .th { background: var(--ont-grey-bar); border-color: var(--ont-border); }
+	#maincontent.ont-plain ul.cbi-tabmenu { background: var(--ont-bg-strip); border-bottom-color: var(--ont-border); }
+	#maincontent.ont-plain ul.cbi-tabmenu > li > a,
+	#maincontent.ont-plain ul.cbi-tabmenu > li.cbi-tab > a { color: var(--ont-text); }
+	#maincontent.ont-plain ul.cbi-tabmenu > li.cbi-tab {
+		background: var(--ont-bg);
+		border-color: var(--ont-border);
+		border-bottom-color: var(--ont-bg);
+	}
+}
+
+@media (prefers-color-scheme: dark) and (max-width: 900px) {
+	#leftcol { background: var(--ont-grey); }
+	html:not(.ont-plain-page) #maincontent ul.cbi-tabmenu { background: var(--ont-bg-strip); }
+	html:not(.ont-plain-page) #maincontent ul.cbi-tabmenu > li > a { color: var(--ont-text); }
 }
