@@ -19,8 +19,9 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="darkreader-lock">
+	<meta name="color-scheme" content="light dark">
 	<title>{{ striptags(hostname) }}{% if (dispatched?.title): %} | {{ _(dispatched.title) }}{% endif %}</title>
-	<link rel="stylesheet" href="{{ media }}/cascade.css?v=20261020b">
+	<link rel="stylesheet" href="{{ media }}/cascade.css?v=20261117">
 	<link rel="icon" href="{{ media }}/logo.svg" sizes="any">
 	<script>
 		/* 这些页面自带布局（会往 #tabmenu 插 tab），不要套用「搬到左栏」的规则 */
