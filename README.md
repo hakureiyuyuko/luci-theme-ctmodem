@@ -72,8 +72,10 @@ luci-theme-ctmodem/
 传到路由器后 `opkg install *.ipk` 或 `apk add --allow-untrusted *.apk`，
 再按「手工切换 / 回退」一节把主题切过来即可（包内已带 uci-defaults，全新安装时会自动切）。
 
-> 包里的 `.ut` 模板会用 SDK 的 `ucode` 预编译，字节码与 ucode 版本绑定，
-> 所以**别跨分支混用**（24.10 的包别装到 25.12 上）。
+> 包内的 `.ut` 模板是**未预编译的源码**（任何 ucode 版本都能加载），但两个包分别用对应分支的
+> SDK 编出、也只在该分支上验证过，所以**建议按分支选包**。
+>
+> 每次 push 到 main 会跑一次构建（产物在 Actions 的 artifact 里），打 `v*` tag 则自动发 Release。
 
 ### 方式二：一键包（tar.gz，免包管理器）
 
