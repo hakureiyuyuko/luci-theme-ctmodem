@@ -44,11 +44,24 @@ jobs:
           tar --zstd -xf sdk.tar.zst
           echo "SDKDIR=$(ls -d openwrt-sdk-*)" >> "$GITHUB_ENV"
 
-      - name: Install package and feeds
+      - name: Install package
+        run: |
+          set -euo pipefail
+          cp -a luci-theme-ctmodem "$SDKDIR/package/"
+
+          # 打 tag 时让包版本跟 tag 走（v0.1.0 -> 0.1.0）。
+          # 注意只能改本包的 Makefile：把 PKG_VERSION 当命令行变量传下去
+          # 会覆盖所有依赖包的版本，导致它们去下 0.1.0 的源码（404）。
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            sed -i "s/^PKG_VERSION:=.*/PKG_VERSION:=${GITHUB_REF_NAME#v}/" \
+              "$SDKDIR/package/luci-theme-ctmodem/Makefile"
+          fi
+          grep -n '^PKG_VERSION\|^PKG_RELEASE' "$SDKDIR/package/luci-theme-ctmodem/Makefile"
+
+      - name: Install feeds
         working-directory: ${{ env.SDKDIR }}
         run: |
           set -euo pipefail
-          cp -a "$GITHUB_WORKSPACE/luci-theme-ctmodem" package/
           ./scripts/feeds update -a
           ./scripts/feeds install -a
 
@@ -57,14 +70,7 @@ jobs:
         run: |
           set -euo pipefail
           make defconfig
-
-          # 打 tag 时用 tag 名覆盖包版本（v0.1.0 -> 0.1.0）
-          extra=()
-          case "${GITHUB_REF}" in
-            refs/tags/v*) extra+=("PKG_VERSION=${GITHUB_REF_NAME#v}") ;;
-          esac
-
-          make package/luci-theme-ctmodem/compile -j"$(nproc)" V=s "${extra[@]}"
+          make package/luci-theme-ctmodem/compile -j"$(nproc)" V=s
 
           # ipk 命名是 name_version_arch.ipk，apk 是 name-version.apk
           mkdir -p "$GITHUB_WORKSPACE/out"
