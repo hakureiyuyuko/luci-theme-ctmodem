@@ -1430,7 +1430,7 @@ body.modal-overlay-active #modal_overlay {
 	#leftmenu > li { padding: 6px 10px; }
 	#maincontent { padding: 8px; }
 	.cbi-value { flex-direction: column; }
-	.cbi-value-title { width: auto; flex: 0 0 auto; }
+	.cbi-value-title { width: auto; flex: 0 0 auto; align-self: stretch; }
 	.cbi-value-field { width: 100%; }
 }
 
