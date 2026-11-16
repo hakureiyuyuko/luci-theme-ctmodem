@@ -1,0 +1,96 @@
+name: build-packages
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # opkg 体系（.ipk）
+          - name: OpenWrt 24.10 / ipk
+            release: '24.10.8'
+          # apk 体系（.apk）
+          - name: OpenWrt 25.12 / apk
+            release: '25.12.6'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tooling
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq zstd
+
+      - name: Fetch SDK
+        run: |
+          set -euo pipefail
+          base="https://downloads.openwrt.org/releases/${{ matrix.release }}/targets/x86/64"
+          sdk=$(curl -fsSL "$base/" | grep -oE 'openwrt-sdk-[^"]*Linux-x86_64\.tar\.zst' | head -n1)
+          test -n "$sdk" || { echo "no SDK found for ${{ matrix.release }}"; exit 1; }
+          echo "SDK: $sdk"
+          curl -fsSL -o sdk.tar.zst "$base/$sdk"
+          tar --zstd -xf sdk.tar.zst
+          echo "SDKDIR=$(ls -d openwrt-sdk-*)" >> "$GITHUB_ENV"
+
+      - name: Install package and feeds
+        working-directory: ${{ env.SDKDIR }}
+        run: |
+          set -euo pipefail
+          cp -a "$GITHUB_WORKSPACE/luci-theme-ctmodem" package/
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+
+      - name: Build package
+        working-directory: ${{ env.SDKDIR }}
+        run: |
+          set -euo pipefail
+          make defconfig
+
+          # 打 tag 时用 tag 名覆盖包版本（v0.1.0 -> 0.1.0）
+          extra=()
+          case "${GITHUB_REF}" in
+            refs/tags/v*) extra+=("PKG_VERSION=${GITHUB_REF_NAME#v}") ;;
+          esac
+
+          make package/luci-theme-ctmodem/compile -j"$(nproc)" V=s "${extra[@]}"
+
+          mkdir -p "$GITHUB_WORKSPACE/out"
+          find bin/packages -type f -name 'luci-theme-ctmodem_*' \
+            -exec cp -v {} "$GITHUB_WORKSPACE/out/" \;
+          ls -l "$GITHUB_WORKSPACE/out"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: luci-theme-ctmodem-${{ matrix.release }}
+          path: out/*
+          if-no-files-found: error
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          fail_on_unmatched_files: true
+          generate_release_notes: true

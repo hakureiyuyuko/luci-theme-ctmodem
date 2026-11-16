@@ -59,7 +59,23 @@ luci-theme-ctmodem/
 
 ## 安装到路由器
 
-### 方式一：一键包（推荐）
+### 方式一：预编译安装包（来自 Releases）
+
+仓库的 GitHub Actions 会为每个 OpenWrt 分支各编一份（主题与架构无关，`Architecture: all`）：
+
+| 固件包管理体系 | 对应 OpenWrt | 产物 |
+| --- | --- | --- |
+| opkg | 24.10.x | `luci-theme-ctmodem_x.y.z-r1_all.ipk` |
+| apk | 25.12.x | `luci-theme-ctmodem-x.y.z-r1.apk` |
+
+在 [Releases](https://github.com/hakureiyuyuko/luci-theme-ctmodem/releases) 下载对应版本，
+传到路由器后 `opkg install *.ipk` 或 `apk add --allow-untrusted *.apk`，
+再按「手工切换 / 回退」一节把主题切过来即可（包内已带 uci-defaults，全新安装时会自动切）。
+
+> 包里的 `.ut` 模板会用 SDK 的 `ucode` 预编译，字节码与 ucode 版本绑定，
+> 所以**别跨分支混用**（24.10 的包别装到 25.12 上）。
+
+### 方式二：一键包（tar.gz，免包管理器）
 
 ```bash
 ./build-theme-pkg.sh          # 生成 testbed/vm/theme.tar.gz
@@ -73,7 +89,7 @@ mkdir -p /tmp/th && tar -xzf /tmp/theme.tar.gz -C /tmp/th && sh /tmp/th/install.
 `/usr/share/ucode/luci/template/themes/ctmodem`，设置
 `luci.main.mediaurlbase=/luci-static/ctmodem` 并重启 uhttpd。
 
-### 方式二：编译进固件
+### 方式三：编译进固件
 
 把 `luci-theme-ctmodem/` 放进 LuCI 源码树的 `themes/` 下（或 feeds），
 `make menuconfig` → LuCI → Themes → `luci-theme-ctmodem`，随固件一起打包。
