@@ -66,8 +66,9 @@ jobs:
 
           make package/luci-theme-ctmodem/compile -j"$(nproc)" V=s "${extra[@]}"
 
+          # ipk 命名是 name_version_arch.ipk，apk 是 name-version.apk
           mkdir -p "$GITHUB_WORKSPACE/out"
-          find bin/packages -type f -name 'luci-theme-ctmodem_*' \
+          find bin/packages -type f \( -name 'luci-theme-ctmodem_*' -o -name 'luci-theme-ctmodem-*' \) \
             -exec cp -v {} "$GITHUB_WORKSPACE/out/" \;
           ls -l "$GITHUB_WORKSPACE/out"
 
